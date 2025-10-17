@@ -1,0 +1,52 @@
+{% extends 'pages/base.html' %}
+{% block title %}Contact 聯絡我們{% endblock %}
+
+{% block content %}
+  <div style="max-width: 800px; margin: 60px auto; text-align: center; padding: 0 20px;">
+
+    <!-- 標題 -->
+    <h1 style="font-size: 2.5em; color: #ffffff; margin-bottom: 25px; text-shadow: 0 0 15px rgba(0, 255, 255, 0.6);">
+      Contact<br>聯絡我們
+    </h1>
+
+    <!-- 說明 -->
+    <p style="font-size: 1.2em; color: #eeeeee; line-height: 1.8; text-shadow: 0 0 5px rgba(0, 255, 255, 0.2); margin-bottom: 30px;">
+      Feel free to reach out to me through the following channels.<br>
+      歡迎透過以下方式聯絡我們！
+    </p>
+
+    <!-- 聯絡資訊 -->
+    <div style="margin-top: 30px;">
+      <p style="font-size: 1.2em; margin-bottom: 20px; color: #ffffff;">
+        📧 <strong>Email：</strong>
+        <a href="mailto:{{ profile.email|default:'you@example.com' }}" 
+           style="color: #00ffff; text-decoration: none; text-shadow: 0 0 8px rgba(0, 255, 255, 0.4); transition: all 0.3s ease;">
+          {{ profile.email|default:"you@example.com" }}
+        </a><br>
+        <span style="font-size:0.9em; color:#cccccc;">電子郵件</span>
+      </p>
+
+      <p style="font-size: 1.2em; color: #ffffff;">
+        💻 <strong>GitHub：</strong>
+        <a href="https://github.com/{{ profile.github|default:'your-handle' }}" 
+           target="_blank" 
+           style="color: #00ffff; text-decoration: none; text-shadow: 0 0 8px rgba(0, 255, 255, 0.4); transition: all 0.3s ease;">
+          {{ profile.github|default:"your-handle" }}
+        </a><br>
+        <span style="font-size:0.9em; color:#cccccc;">程式碼作品集</span>
+      </p>
+    </div>
+  </div>
+
+  <script>
+    // 加一點互動：連結 hover 時發亮
+    document.querySelectorAll('a').forEach(a => {
+      a.addEventListener('mouseenter', () => {
+        a.style.textShadow = '0 0 15px #00ffff';
+      });
+      a.addEventListener('mouseleave', () => {
+        a.style.textShadow = '0 0 8px rgba(0, 255, 255, 0.4)';
+      });
+    });
+  </script>
+{% endblock %}

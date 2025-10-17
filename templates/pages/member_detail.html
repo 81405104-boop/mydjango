@@ -1,0 +1,35 @@
+{% extends 'pages/base.html' %}
+{% load static %}
+{% block title %}{{ profile.name }} 的個人介紹{% endblock %}
+
+{% block content %}
+  <div style="max-width: 800px; margin: 60px auto; text-align: center; padding: 0 20px;">
+
+    <!-- 頭像 -->
+    <img src="{% static profile.img %}" alt="{{ profile.name }}"
+         style="width: 180px; height: 180px; border-radius: 50%; object-fit: cover;
+                margin-bottom: 25px; box-shadow: 0 0 20px rgba(0,255,255,0.5);">
+
+    <!-- 姓名 -->
+    <h1 style="font-size: 2.2em; color: #ffffff; text-shadow: 0 0 15px rgba(0,255,255,0.6); margin-bottom: 15px;">
+      {{ profile.name }}
+    </h1>
+
+    <!-- 自我介紹（加入 |safe，讓 <br> 換行生效） -->
+    <p style="font-size: 1.2em; color: #eeeeee; line-height: 1.8; text-shadow: 0 0 5px rgba(0,255,255,0.2);">
+      {{ profile.intro|safe }}
+    </p>
+
+    <!-- 返回首頁按鈕 -->
+    <div style="margin-top: 40px;">
+      <a href="/" 
+         style="background: #00bcd4; color: white; padding: 12px 24px;
+                text-decoration: none; border-radius: 6px; font-size: 1.1em;
+                box-shadow: 0 0 10px rgba(0,255,255,0.5);
+                transition: all 0.3s ease;">
+        ← 回首頁
+      </a>
+    </div>
+
+  </div>
+{% endblock %}

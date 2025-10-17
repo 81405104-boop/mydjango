@@ -1,0 +1,112 @@
+/* ===== 全域設定 ===== */
+body {
+  margin: 0;
+  font-family: 'Noto Sans TC', 'Roboto', sans-serif;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  background-attachment: fixed;
+  color: #ffffff;              /* ✅ 全站字體改成白色 */
+}
+
+a {
+  text-decoration: none;
+  color: #ffffff;              /* ✅ 所有連結預設白字 */
+}
+
+/* ===== 導覽列 ===== */
+header.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 15px rgba(0, 255, 255, 0.2);
+}
+
+header .logo-link {
+  font-size: 1.4em;
+  font-weight: bold;
+  letter-spacing: 1px;
+  color: #ffffff;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.4); /* ✅ 炫光 */
+}
+
+header .logo-link .en {
+  font-size: 0.85em;
+  opacity: 0.8;
+  margin-left: 5px;
+}
+
+nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 30px;
+}
+
+nav li a {
+  text-align: center;
+  font-size: 1em;
+  line-height: 1.2;
+  transition: all 0.3s ease;
+  color: #ffffff;
+}
+
+nav li a .en {
+  display: block;
+  font-size: 0.8em;
+  opacity: 0.7;
+}
+
+nav li a:hover {
+  color: #00ffff;
+  text-shadow: 0 0 15px #00ffff, 0 0 25px #00ffff;
+  transform: scale(1.05);
+}
+
+/* ===== 內容區 ===== */
+main.content {
+  max-width: 1000px;
+  margin: 60px auto;
+  padding: 30px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(8px);
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+  color: #ffffff; /* ✅ 內容區白字 */
+  min-height: 400px;
+}
+
+/* ===== 頁尾 ===== */
+footer.footer {
+  text-align: center;
+  padding: 20px;
+  font-size: 0.9em;
+  color: #eeeeee;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(5px);
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* ===== RWD 響應式 ===== */
+@media (max-width: 768px) {
+  header.navbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  nav ul {
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 10px;
+  }
+
+  main.content {
+    margin: 30px 10px;
+    padding: 20px;
+  }
+}

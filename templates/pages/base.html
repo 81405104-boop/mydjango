@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <title>{% block title %}我們的網站 | My Profile{% endblock %}</title>
+  {% load static %}
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Google 字體 -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+
+  <!-- 導覽列 -->
+  <header class="navbar">
+    <div class="logo">
+      <a href="/" class="logo-link">🔥 我們的網站 🔥<span class="en">My Profile</span></a>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="/">首頁<br><span class="en">Home</span></a></li>
+        <li><a href="/about/">關於我<br><span class="en">About</span></a></li>
+        <li><a href="/contact/">聯絡我<br><span class="en">Contact</span></a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- 頁面內容 -->
+  <main class="content">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- 頁尾 -->
+  <footer class="footer">
+    <p>© 2025 我們的網站 | My Personal Website</p>
+  </footer>
+
+</body>
+</html>

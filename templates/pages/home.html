@@ -1,0 +1,42 @@
+{% extends 'pages/base.html' %}
+{% load static %}
+{% block title %}Home 首頁{% endblock %}
+
+{% block content %}
+  <div style="text-align: center; padding: 40px 20px;">
+    <h1 style="font-size: 2.5em; color: #ffffff; margin-bottom: 20px; text-shadow: 0 0 12px rgba(0,255,255,0.6);">
+      Welcome to Our Team<br>歡迎來到我們的首頁
+    </h1>
+    <p style="font-size: 1.2em; color: #eeeeee; margin-bottom: 40px; text-shadow: 0 0 6px rgba(0,255,255,0.3);">
+      這裡是我們的團隊成員介紹區塊，每位成員都有自己的照片、名字與學號。
+    </p>
+
+    <!-- 團隊成員卡片區 -->
+    <div style="
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 20px;
+      max-width: 1000px;
+      margin: 0 auto;
+    ">
+
+      {% for member in members %}
+      <a href="{% url 'member_detail' member.id %}" style="text-decoration: none;">
+        <div style="background: rgba(255, 255, 255, 0.08); 
+                    border-radius: 12px; 
+                    padding: 20px; 
+                    text-align: center; 
+                    box-shadow: 0 0 15px rgba(0,255,255,0.15);
+                    transition: transform 0.3s ease, box-shadow 0.3s ease;">
+          <img src="{% static member.img %}" alt="{{ member.name }}" 
+              style="width: 100%; max-width: 150px; height: 150px; object-fit: cover; border-radius: 50%; margin-bottom: 15px; box-shadow: 0 0 10px rgba(0,255,255,0.3);">
+          <h3 style="margin: 0; color: #ffffff; font-size: 1.2em; text-shadow: 0 0 8px rgba(0,255,255,0.4);">
+            {{ member.name }}
+          </h3>
+          <p style="color: #dddddd; font-size: 0.95em;">{{ member.id|upper }}</p>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %}
