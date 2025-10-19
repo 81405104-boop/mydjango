@@ -13,7 +13,7 @@ SECRET_KEY = 'django-insecure-your-secret-key'
 DEBUG = True
 
 # 允許訪問的主機列表
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['mydjango-jpmm.onrender.com']
 
 
 # ================================
@@ -110,7 +110,13 @@ USE_TZ = True
 # 📌 靜態檔案設定
 # ================================
 STATIC_URL = 'static/'
+
+# 設定靜態檔案收集的目錄
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+
+# 用來收集靜態檔案的資料夾
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 
 # ================================
 # 📌 媒體檔案設定（可用於上傳圖片）
