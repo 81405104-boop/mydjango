@@ -1,131 +1,38 @@
-from pathlib import Path
-import os  # 用於靜態檔與模板的路徑拼接
+(venv) D:\mydjango>python manage.py collectstatic --noinput
+Traceback (most recent call last):
+  File "D:\mydjango\manage.py", line 22, in <module>
+    main()
+    ~~~~^^
+  File "D:\mydjango\manage.py", line 18, in main
+    execute_from_command_line(sys.argv)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "D:\mydjango\venv\Lib\site-packages\django\core\management\__init__.py", line 442, in execute_from_command_line
+    utility.execute()
+    ~~~~~~~~~~~~~~~^^
+  File "D:\mydjango\venv\Lib\site-packages\django\core\management\__init__.py", line 382, in execute
+    settings.INSTALLED_APPS
+  File "D:\mydjango\venv\Lib\site-packages\django\conf\__init__.py", line 81, in __getattr__
+    self._setup(name)
+    ~~~~~~~~~~~^^^^^^
+  File "D:\mydjango\venv\Lib\site-packages\django\conf\__init__.py", line 68, in _setup
+    self._wrapped = Settings(settings_module)
+                    ~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "D:\mydjango\venv\Lib\site-packages\django\conf\__init__.py", line 166, in __init__
+    mod = importlib.import_module(self.SETTINGS_MODULE)
+  File "D:\Python\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 758, in exec_module
+  File "<frozen importlib._bootstrap_external>", line 896, in get_code
+  File "<frozen importlib._bootstrap_external>", line 826, in source_to_code
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "D:\mydjango\myprofile_site\settings.py", line 68
+    'django.template.context_p_
+    ^
+SyntaxError: unterminated string literal (detected at line 68)
 
-# ================================
-# 📌 專案基本設定
-# ================================
-BASE_DIR = Path(__file__).resolve().parent.parent
-
-# ⚠️ 正式環境請將 SECRET_KEY 移到環境變數
-SECRET_KEY = 'django-insecure-your-secret-key'
-
-# 開發階段建議為 True，上線請改 False
-DEBUG = True
-
-# 允許訪問的主機列表
-ALLOWED_HOSTS = ['mydjango-jpmm.onrender.com']
-
-
-# ================================
-# 📌 App 設定
-# ================================
-INSTALLED_APPS = [
-    # Django 內建 App
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-
-    # 自訂 App
-    'pages',   # ← 你的主網站頁面
-]
-
-
-# ================================
-# 📌 Middleware 設定
-# ================================
-MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-]
-
-
-# ================================
-# 📌 URL & WSGI 設定
-# ================================
-ROOT_URLCONF = 'myprofile_site.urls'
-WSGI_APPLICATION = 'myprofile_site.wsgi.application'
-
-
-# ================================
-# 📌 Template 設定
-# ================================
-TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        # 讓 Django 能在專案根目錄下的 templates 資料夾找 HTML
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
-        },
-    },
-]
-
-
-# ================================
-# 📌 資料庫設定（預設 SQLite）
-# ================================
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
-
-# ================================
-# 📌 密碼驗證設定（預設即可）
-# ================================
-AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
-]
-
-
-# ================================
-# 📌 語系與時區設定
-# ================================
-LANGUAGE_CODE = 'en-us'        # 語系
-TIME_ZONE = 'Asia/Taipei'      # 時區
-USE_I18N = True
-USE_TZ = True
-
-
-# ================================
-# 📌 靜態檔案設定
-# ================================
-STATIC_URL = 'static/'
-
-# 設定靜態檔案收集的目錄
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
-
-# 用來收集靜態檔案的資料夾
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
-
-# ================================
-# 📌 媒體檔案設定（可用於上傳圖片）
-# ================================
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-
-# ================================
-# 📌 其他設定
-# ================================
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+(venv) D:\mydjango>
