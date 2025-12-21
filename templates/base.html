@@ -1,0 +1,263 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}我的商店{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <style>
+    /* ====== 整體風格 ====== */
+    body.site-bg {
+      margin: 0;
+      overflow: hidden;
+      font-family: "Noto Sans TC", "Segoe UI Emoji", sans-serif;
+      background: radial-gradient(circle at center, #f8f3e6, #e3caa5, #b59f3b);
+      animation: fadeInTemple 2s ease-out;
+      position: relative;
+    }
+
+    @keyframes fadeInTemple {
+      from { opacity: 0; background-color: #000; }
+      to { opacity: 1; background-color: transparent; }
+    }
+
+    /* ====== 柔光放射光柱 ====== */
+    .light-rays {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at center, rgba(255,240,180,0.3) 0%, transparent 70%),
+                  repeating-conic-gradient(from 0deg, rgba(255,255,200,0.1) 0deg, transparent 20deg);
+      mix-blend-mode: screen;
+      animation: rayRotate 30s linear infinite;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    @keyframes rayRotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* ====== 金色柔光背景動畫 ====== */
+    body::after {
+      content: "";
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(circle, rgba(255,215,0,0.25) 0%, transparent 70%);
+      animation: softGlow 5s ease-in-out infinite alternate;
+      z-index: -2;
+    }
+
+    @keyframes softGlow {
+      from { opacity: 0.3; }
+      to { opacity: 0.9; }
+    }
+
+    /* ====== 導覽列 ====== */
+    .navbar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 40px;
+      padding: 12px 40px;
+      background: linear-gradient(135deg, #243b55, #141E30, #5f2c82);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 3px solid rgba(255,255,255,0.2);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      animation: flicker 4s infinite alternate ease-in-out;
+    }
+
+    @keyframes flicker {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.96; transform: rotate(0.3deg); }
+    }
+
+    /* ====== 旗幟 ====== */
+    .flag {
+      width: 40px;
+      height: 26px;
+      border-radius: 3px;
+      box-shadow: 0 0 6px rgba(255,255,255,0.6);
+      animation: flagBreath 3s ease-in-out infinite alternate;
+      vertical-align: middle;
+    }
+
+    @keyframes flagBreath {
+      0% { transform: scale(1); filter: brightness(0.9); }
+      100% { transform: scale(1.08); filter: brightness(1.2); }
+    }
+
+    /* ====== 導覽項目 ====== */
+    .nav-center {
+      display: flex;
+      align-items: center;
+      gap: 50px;
+    }
+
+    .navbar-link, .navbar-btn {
+      text-decoration: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #f2f2f2;
+      font-size: 20px;
+      font-weight: 700;
+      text-align: center;
+      font-family: "Noto Sans TC", "Segoe UI Emoji", sans-serif;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+      transition: all 0.3s ease;
+    }
+
+    .navbar-link:hover, .navbar-btn:hover {
+      color: #ffe26f;
+      transform: translateY(-3px) scale(1.05);
+      text-shadow: 0 0 10px rgba(255,255,255,0.7);
+    }
+
+    .en-text {
+      display: block;
+      font-size: 13px;
+      color: #ddd;
+      margin-top: 4px;
+    }
+
+    .navbar-user {
+      font-size: 18px;
+      color: #ffdd88;
+      font-weight: 600;
+      text-shadow: 0 0 5px rgba(255,255,255,0.5);
+      margin-top: 5px;
+    }
+
+    /* ====== 粒子 ====== */
+    .particle {
+      position: fixed;
+      width: 6px;
+      height: 6px;
+      background: rgba(255,255,200,0.7);
+      border-radius: 50%;
+      box-shadow: 0 0 10px rgba(255,255,160,0.8);
+      animation: floatParticle linear infinite;
+      z-index: -1;
+    }
+
+    @keyframes floatParticle {
+      from { transform: translateY(100vh) scale(0.8); opacity: 0.8; }
+      to { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+    }
+  </style>
+</head>
+
+<body class="site-bg">
+
+  <!-- ====== 背景神光與粒子 ====== -->
+  <div class="light-rays"></div>
+
+  <script>
+    // === 生成粒子效果 ===
+    for (let i = 0; i < 40; i++) {
+      const particle = document.createElement('div');
+      particle.classList.add('particle');
+      document.body.appendChild(particle);
+      const size = Math.random() * 6 + 2;
+      const left = Math.random() * 100;
+      const duration = Math.random() * 10 + 10;
+      const delay = Math.random() * 10;
+      particle.style.width = particle.style.height = `${size}px`;
+      particle.style.left = `${left}vw`;
+      particle.style.animationDuration = `${duration}s`;
+      particle.style.animationDelay = `${delay}s`;
+    }
+  </script>
+
+  <!-- ====== 導覽列（旗幟置中） ====== -->
+  <nav class="navbar">
+    <img src="{% static 'images/flags/nepal_flag.png' %}" alt="尼泊爾國旗" class="flag">
+
+    <div class="nav-center">
+      <a href="{% url 'products:home' %}" class="navbar-link">
+        🏠 首頁
+        <span class="en-text">Home</span>
+      </a>
+
+      <a href="{% url 'cart:cart_view' %}" class="navbar-link">
+        🛒 購物車
+        <span class="en-text">Cart</span>
+      </a>
+
+      {% if user.is_authenticated %}
+        <span class="navbar-user">👤 {{ user.username }}</span>
+        <form method="post" action="{% url 'accounts:logout' %}" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" class="navbar-btn">
+            🚪 登出
+            <span class="en-text">Logout</span>
+          </button>
+        </form>
+      {% else %}
+        <a href="{% url 'accounts:login' %}" class="navbar-link">
+          🔑 登入
+          <span class="en-text">Login</span>
+        </a>
+        <a href="{% url 'accounts:register' %}" class="navbar-link">
+          📝 註冊
+          <span class="en-text">Register</span>
+        </a>
+      {% endif %}
+    </div>
+
+    <img src="{% static 'images/flags/taiwan_flag.png' %}" alt="中華民國國旗" class="flag">
+  </nav>
+
+  {% block content %}{% endblock %}
+
+  <!-- ====== 神殿音樂背景（立即播放 + 記憶播放時間） ====== -->
+  <audio id="bgm" preload="auto" playsinline>
+    <source src="{% static 'music/temple_theme.mp3' %}" type="audio/mpeg">
+    您的瀏覽器不支援音樂播放。
+  </audio>
+
+  <script>
+    const bgm = document.getElementById("bgm");
+    const STORAGE_KEY = "temple_bgm_time";
+
+    // 從 localStorage 取回上次播放時間
+    const savedTime = localStorage.getItem(STORAGE_KEY);
+    if (savedTime) bgm.currentTime = parseFloat(savedTime);
+
+    function playTempleMusic() {
+      bgm.volume = 0.4;
+      const tryPlay = () => {
+        bgm.play().catch(() => setTimeout(tryPlay, 500));
+      };
+      tryPlay();
+    }
+
+    // 每秒記錄播放進度
+    setInterval(() => {
+      if (!bgm.paused && bgm.currentTime > 0) {
+        localStorage.setItem(STORAGE_KEY, bgm.currentTime);
+      }
+    }, 1000);
+
+    // 自動重播
+    bgm.addEventListener("ended", () => {
+      bgm.currentTime = 0;
+      bgm.play();
+    });
+
+    // 若被暫停，自動恢復播放
+    setInterval(() => {
+      if (bgm.paused) bgm.play().catch(() => {});
+    }, 3000);
+
+    document.addEventListener("DOMContentLoaded", playTempleMusic);
+  </script>
+
+</body>
+</html>

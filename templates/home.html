@@ -1,0 +1,333 @@
+﻿{% extends "base.html" %}
+{% load static %}
+{% block title %}首頁 (Home){% endblock %}
+
+{% block content %}
+<style>
+  body {
+    background: radial-gradient(circle at center, #f8f3e6 0%, #e3caa5 50%, #b59f3b 100%);
+    background-attachment: fixed;
+    font-family: 'Noto Serif TC', 'Cinzel', serif;
+    color: #2d1b0e;
+    overflow-x: hidden;
+    height: 100vh;
+  }
+
+  .golden-halo {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    box-shadow: 0 0 150px 80px rgba(255, 215, 0, 0.15);
+    transform: translate(-50%, -50%) scale(0);
+    animation: haloExpand 3s ease-out forwards;
+    z-index: -1;
+  }
+  @keyframes haloExpand {
+    0% { transform: translate(-50%, -50%) scale(0.2); opacity: 0; }
+    50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.5; }
+    100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-image: url("{% static 'images/bg/mandala_pattern.png' %}");
+    background-size: 500px;
+    opacity: 0.08;
+    z-index: -2;
+  }
+
+  #particle-bg {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -3;
+  }
+
+  .home-title {
+    font-size: 34px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 12px;
+    color: #8b4513;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    animation: titleGlow 3s ease-in-out infinite alternate;
+  }
+  @keyframes titleGlow {
+    from { text-shadow: 0 0 6px #f5d742, 0 0 12px #facc15; }
+    to { text-shadow: 0 0 20px #f5d742, 0 0 40px #facc15; }
+  }
+
+  .home-subtitle {
+    font-size: 17px;
+    margin-bottom: 25px;
+    text-align: center;
+    line-height: 1.8;
+  }
+
+  .home-section {
+    margin: 40px auto 20px;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    color: white;
+    background: linear-gradient(90deg, #b45309, #facc15, #b45309);
+    border-radius: 30px;
+    display: inline-block;
+    padding: 10px 24px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: sectionLight 4s ease-in-out infinite alternate;
+  }
+  @keyframes sectionLight {
+    0% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.4); }
+    100% { box-shadow: 0 0 40px rgba(255, 225, 100, 0.8); }
+  }
+
+  .en-line {
+    display: block;
+    font-size: 0.85em;
+    color: #eee;
+    margin-top: 4px;
+  }
+
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 25px;
+    margin-top: 20px;
+    padding-bottom: 40px;
+  }
+
+  .product-card {
+    border: 2px solid rgba(255, 215, 0, 0.5);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+    background: rgba(255,255,255,0.9);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .product-card:hover { transform: translateY(-8px); box-shadow: 0 10px 22px rgba(255, 200, 0, 0.3); }
+
+  .product-img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    border: 1px solid #e5c07b;
+    display: block;
+  }
+
+  .ad-box {
+    background: rgba(255,255,255,0.9);
+    padding: 12px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+  }
+
+  /* 固定 AD1、AD2 高度 360px（中心裁切） */
+  .ad-box.static img {
+    width: 100%;
+    height: 360px;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 8px;
+    display: block;
+  }
+
+  /* === 輪播廣告：固定高度 + 以中心裁切，並把標題改成浮水徽章（不佔高度） === */
+  .ad-slider {
+    position: relative;
+    width: 100%;
+    height: 240px;
+    overflow: hidden;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+  }
+
+  .ad-slide {
+    position: absolute;
+    inset: 0;             /* 等同 top/right/bottom/left 皆為 0 */
+    opacity: 0;
+    transition: opacity 0.9s ease-in-out;
+  }
+  .ad-slide.active { opacity: 1; }
+
+  /* 媒體統一：填滿容器、中心裁切、不留底部空白 */
+  .ad-media {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 10px;
+    display: block;       /* 移除 img baseline 造成的額外空隙 */
+  }
+
+  /* 浮水徽章（原本的 h3 改為不佔高度的絕對定位） */
+  .ad-badge {
+    position: absolute;
+    left: 10px;
+    bottom: 10px;
+    padding: 6px 10px;
+    font-size: 14px;
+    color: #2d1b0e;
+    background: rgba(255, 215, 0, 0.9);
+    border-radius: 999px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    pointer-events: none;
+    user-select: none;
+  }
+  .ad-badge .en-line { color: #4a3a12; margin-top: 2px; font-size: 12px; }
+</style>
+
+<div class="golden-halo"></div>
+<canvas id="particle-bg"></canvas>
+
+<main style="display:grid; grid-template-columns: 200px 1fr 200px; gap:20px; padding:20px; height:calc(100vh - 60px);">
+
+  <!-- 左側廣告區 -->
+  <div>
+    <!-- 固定 AD1 -->
+    <div class="ad-box static">
+      <h3>🔥 熱門廣告<span class="en-line">Hot Ads</span></h3>
+      <a href="https://www.google.com" target="_blank">
+        <img src="{% static 'images/ads/ad1.gif' %}" alt="AD1">
+      </a>
+    </div>
+
+    <!-- 輪播 AD3~AD5 -->
+    <div class="ad-box ad-slider" id="left-ads">
+      <div class="ad-slide active">
+        <img class="ad-media" src="{% static 'images/ads/ad3.gif' %}" alt="AD3">
+        <div class="ad-badge">🌟 限時優惠<span class="en-line">AD3</span></div>
+      </div>
+      <div class="ad-slide">
+        <img class="ad-media" src="{% static 'images/ads/ad4.gif' %}" alt="AD4">
+        <div class="ad-badge">🎁 本週主打<span class="en-line">AD4</span></div>
+      </div>
+      <div class="ad-slide">
+        <img class="ad-media" src="{% static 'images/ads/ad5.gif' %}" alt="AD5">
+        <div class="ad-badge">🔥 超值加購<span class="en-line">AD5</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 中間商品區 -->
+  <div class="scroll-area" style="overflow-y:auto; padding-right:10px;">
+    <h1 class="home-title">
+      🎉 心黑賺得多 🎉
+      <span class="en-line">Black Heart, Big Profit</span>
+    </h1>
+
+    <p class="home-subtitle">
+      全館電線電纜 <strong>全面8折</strong>，快來搶購！
+      <span class="en-line">All cables 20% off — grab yours now!</span>
+    </p>
+
+    <h2 class="home-section">
+      ✨ 精選商品
+      <span class="en-line">Featured Products</span>
+    </h2>
+
+    <div class="product-grid">
+      {% for product in products %}
+      <div class="product-card">
+        {% if product.image %}
+          <img src="{% static 'images/products/' %}{{ product.image }}" alt="{{ product.name }}" class="product-img">
+        {% else %}
+          <div class="product-noimg">No Image</div>
+        {% endif %}
+        <h3>{{ product.name }}</h3>
+        <p>NT$ {{ product.price }}</p>
+        <form method="post" action="{% url 'cart:add_to_cart' product.id %}">
+          {% csrf_token %}
+          <button type="submit" class="btn-primary">🛒 加入購物車</button>
+        </form>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- 右側廣告區 -->
+  <div>
+    <!-- 固定 AD2 -->
+    <div class="ad-box static">
+      <h3>🎯 推薦商品<span class="en-line">Recommended</span></h3>
+      <a href="https://www.yahoo.com" target="_blank">
+        <img src="{% static 'images/ads/ad2.gif' %}" alt="AD2">
+      </a>
+    </div>
+
+    <!-- 輪播 AD6~AD8 -->
+    <div class="ad-box ad-slider" id="right-ads">
+      <div class="ad-slide active">
+        <img class="ad-media" src="{% static 'images/ads/ad6.gif' %}" alt="AD6">
+        <div class="ad-badge">💎 推薦新品<span class="en-line">AD6</span></div>
+      </div>
+      <div class="ad-slide">
+        <img class="ad-media" src="{% static 'images/ads/ad7.gif' %}" alt="AD7">
+        <div class="ad-badge">⚡ 熱銷商品<span class="en-line">AD7</span></div>
+      </div>
+      <div class="ad-slide">
+        <img class="ad-media" src="{% static 'images/ads/ad8.gif' %}" alt="AD8">
+        <div class="ad-badge">🎯 精選配件<span class="en-line">AD8</span></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+/* 粒子背景動畫 */
+const c = document.getElementById('particle-bg');
+const ctx = c.getContext('2d');
+function resize(){ c.width = innerWidth; c.height = innerHeight; }
+resize(); window.addEventListener('resize', resize);
+const particles = Array.from({length: 60}, () => ({
+  x: Math.random()*c.width,
+  y: Math.random()*c.height,
+  r: Math.random()*3 + 1,
+  dx: (Math.random()-0.5)*0.6,
+  dy: (Math.random()-0.5)*0.6,
+  color: `hsl(${Math.random()*50+30},70%,60%)`
+}));
+function draw(){
+  ctx.clearRect(0,0,c.width,c.height);
+  particles.forEach(p=>{
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle=p.color;
+    ctx.fill();
+    p.x+=p.dx; p.y+=p.dy;
+    if(p.x<0||p.x>c.width) p.dx*=-1;
+    if(p.y<0||p.y>c.height) p.dy*=-1;
+  });
+  requestAnimationFrame(draw);
+}
+draw();
+
+/* 左右獨立輪播控制（每 5 秒） */
+function setupSlider(containerId, interval=5000){
+  const slides = document.querySelectorAll(`#${containerId} .ad-slide`);
+  let index = 0;
+  setInterval(()=>{
+    slides[index].classList.remove('active');
+    index = (index + 1) % slides.length;
+    slides[index].classList.add('active');
+  }, interval);
+}
+setupSlider("left-ads", 5000);
+setupSlider("right-ads", 5000);
+</script>
+{% endblock %}

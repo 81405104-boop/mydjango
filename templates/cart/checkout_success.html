@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}結帳完成 | Checkout Complete{% endblock %}
+
+{% block content %}
+<style>
+  .checkout-box {
+    max-width: 600px;
+    margin: 60px auto;
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    text-align: center;
+    animation: fadeIn 1s ease-in-out;
+  }
+
+  .checkout-box h2 {
+    font-size: 26px;
+    color: #28a745;
+    margin-bottom: 20px;
+  }
+
+  .checkout-box p {
+    font-size: 18px;
+    margin-bottom: 12px;
+  }
+
+  .checkout-box img {
+    width: 150px;
+    margin-bottom: 20px;
+    animation: bounce 1.5s infinite;
+  }
+
+  .btn-primary {
+    display: inline-block;
+    background: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 16px;
+    transition: background 0.3s ease;
+  }
+
+  .btn-primary:hover {
+    background: #0056b3;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+</style>
+
+<div class="checkout-box">
+  <img src="{% static 'images/checkout_success.gif' %}" alt="成功" />
+  
+  <h2>💳 結帳完成！</h2>
+  <p>💳 Checkout Complete!</p>
+
+  <p>感謝您的購買，本次交易已成功。</p>
+  <p>Thank you for your purchase. Your transaction was successful.</p>
+
+  <p>希望您喜歡我們的商品 ❤️</p>
+  <p>We hope you enjoy our products ❤️</p>
+
+  <a href="{% url 'products:home' %}" class="btn-primary">🏠 返回首頁 / Back to Home</a>
+</div>
+{% endblock %}

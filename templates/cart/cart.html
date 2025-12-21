@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}購物車{% endblock %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 40px auto; background: white; padding: 25px; border-radius: 10px; box-shadow: 0 3px 10px rgba(0,0,0,0.1);">
+
+  <h2 style="text-align:center; margin-bottom:25px;">🛒 我的購物車</h2>
+
+  {% if items %}
+    <table class="cart-table">
+      <thead>
+        <tr>
+          <th>商品圖片</th>
+          <th>商品名稱</th>
+          <th>數量</th>
+          <th>單價</th>
+          <th>小計</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in items %}
+        <tr>
+          <td>
+            {% if item.image %}
+              <img src="{% static 'images/products/' %}{{ item.image }}" alt="{{ item.name }}" class="cart-img">
+            {% else %}
+              <div class="cart-img no-img">No Image</div>
+            {% endif %}
+          </td>
+          <td>{{ item.name }}</td>
+          <td>{{ item.qty }}</td>
+          <td>NT$ {{ item.price }}</td>
+          <td>NT$ {{ item.subtotal }}</td>
+          <td>
+            <form method="post" action="{% url 'cart:remove_from_cart' item.id %}">
+              {% csrf_token %}
+              <button type="submit" class="btn-danger">移除</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <h3 class="cart-total">總金額：NT$ {{ total }}</h3>
+
+    <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:25px;">
+      <form method="post" action="{% url 'cart:checkout' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn-primary">💳 前往結帳</button>
+      </form>
+
+      <form method="post" action="{% url 'cart:clear_cart' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn-secondary">🧹 清空購物車</button>
+      </form>
+    </div>
+
+  {% else %}
+    <p style="text-align:center; font-size:18px;">購物車目前是空的 🛍️</p>
+    <div style="text-align:center; margin-top:20px;">
+      <a href="{% url 'products:home' %}" class="btn-primary">返回首頁繼續購物</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
