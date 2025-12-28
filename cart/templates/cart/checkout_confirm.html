@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}訂單確認 | Order Summary{% endblock %}
+
+{% block content %}
+<div class="form-container">
+
+  <!-- 🔍 教師用驗證（可留） -->
+  <div style="color:green;font-weight:700;text-align:center;margin-bottom:10px;">
+    ✅ checkout_confirm.html 正在使用
+  </div>
+
+  <div class="order-card">
+    <h2 class="order-title">
+      🧾 訂單摘要
+      <div class="en-sub-title">Order Summary</div>
+    </h2>
+
+    <!-- ====== 商品清單 ====== -->
+    <table class="order-table">
+      <thead>
+        <tr>
+          <th>商品<div class="en-sub">Product</div></th>
+          <th>數量<div class="en-sub">Qty</div></th>
+          <th>小計<div class="en-sub">Subtotal</div></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in items %}
+        <tr>
+          <td class="product-name">{{ item.name }}</td>
+          <td class="center">{{ item.qty }}</td>
+          <td class="right">NT$ {{ item.subtotal }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- ====== 總金額 ====== -->
+    <div class="order-total">
+      總金額：NT$ {{ total }}
+      <div class="en-sub-title">Total Amount</div>
+    </div>
+
+    <!-- ====== 行動按鈕 ====== -->
+    <div class="order-actions">
+      <a href="{% url 'cart:cart_view' %}" class="btn-outline">
+        ↩ 返回購物車
+      </a>
+
+      <!-- ✅ 按下去才真的結帳 -->
+      <form method="post" action="{% url 'cart:checkout' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn-pay">
+          💳 確認付款
+          <div class="en-sub-btn">Pay Now</div>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ================= 樣式（含手機版） ================= -->
+<style>
+/* ====== 卡片 ====== */
+.order-card{
+  max-width:640px;
+  margin:40px auto;
+  background:#fff;
+  padding:28px;
+  border-radius:18px;
+  box-shadow:0 14px 35px rgba(0,0,0,.18);
+}
+
+/* 標題 */
+.order-title{
+  text-align:center;
+  margin-bottom:18px;
+}
+.en-sub-title{
+  font-size:14px;
+  color:#666;
+  margin-top:6px;
+}
+
+/* 表格 */
+.order-table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:10px;
+}
+.order-table th,
+.order-table td{
+  padding:12px 10px;
+  border-bottom:1px solid #eee;
+}
+.order-table th{
+  text-align:center;
+  font-weight:900;
+}
+.product-name{
+  text-align:center;
+  font-weight:700;
+}
+.center{text-align:center;}
+.right{text-align:right;}
+
+/* 總金額 */
+.order-total{
+  margin-top:20px;
+  text-align:center;
+  font-size:20px;
+  font-weight:900;
+}
+
+/* 行動按鈕 */
+.order-actions{
+  margin-top:26px;
+  display:flex;
+  justify-content:center;
+  gap:14px;
+  flex-wrap:wrap;
+}
+.btn-outline{
+  padding:12px 18px;
+  border-radius:12px;
+  border:2px solid #2d6cdf;
+  background:#fff;
+  color:#2d6cdf;
+  font-weight:900;
+  text-decoration:none;
+}
+.btn-pay{
+  padding:12px 22px;
+  border-radius:12px;
+  border:none;
+  background:#2d6cdf;
+  color:#fff;
+  font-weight:900;
+  cursor:pointer;
+}
+.btn-pay:hover,
+.btn-outline:hover{opacity:.92;}
+
+.en-sub{font-size:12px;color:#777;}
+.en-sub-btn{font-size:12px;opacity:.9;}
+
+/* ====== 📱 手機版卡片化 ====== */
+@media (max-width: 640px){
+  .order-table,
+  .order-table thead{
+    display:none;
+  }
+
+  .order-card{
+    padding:22px;
+  }
+
+  .order-table tbody tr{
+    display:block;
+    background:#fafafa;
+    margin-bottom:14px;
+    padding:14px;
+    border-radius:12px;
+  }
+
+  .order-table tbody td{
+    display:flex;
+    justify-content:space-between;
+    border:none;
+    padding:6px 0;
+  }
+
+  .order-table tbody td::before{
+    content: attr(data-label);
+    font-weight:700;
+    color:#555;
+  }
+}
+</style>
+{% endblock %}

@@ -1,34 +1,56 @@
 {% extends "base.html" %}
-{% block title %}購物車{% endblock %}
+{% load static %}
+{% block title %}購物車 Shopping Cart{% endblock %}
 
 {% block content %}
+
+<!-- ===== DEBUG：確認這份模板真的有被用到 ===== -->
+<div style="position:fixed;top:10px;left:10px;z-index:999999;
+            background:red;color:white;padding:6px 10px;font-weight:900;">
+  DEBUG: THIS CART TEMPLATE IS ACTIVE
+</div>
+
 <div class="cart-container">
-  <h2>🛒 我的購物車</h2>
+
+  <h2>
+    🛒 我的購物車 <small>(My Shopping Cart)</small>
+  </h2>
 
   {% if items %}
   <table class="cart-table">
     <thead>
       <tr>
-        <th>商品圖片</th>
-        <th>名稱</th>
-        <th>數量</th>
-        <th>單價</th>
-        <th>小計</th>
-        <th>操作</th>
+        <th>商品圖片<br><small>Product Image</small></th>
+        <th>商品名稱<br><small>Product Name</small></th>
+        <th>數量<br><small>Quantity</small></th>
+        <th>單價<br><small>Price</small></th>
+        <th>小計<br><small>Subtotal</small></th>
+        <th>操作<br><small>Action</small></th>
       </tr>
     </thead>
+
     <tbody>
       {% for item in items %}
       <tr>
-        <td><img src="{% static item.image %}" alt="{{ item.name }}" class="cart-img"></td>
-        <td>{{ item.name }}</td>
-        <td>{{ item.qty }}</td>
-        <td>NT$ {{ item.price }}</td>
-        <td>NT$ {{ item.subtotal }}</td>
         <td>
+          <img
+            src="{% static item.image %}"
+            alt="{{ item.name }}"
+            class="cart-img"
+          >
+        </td>
+
+        <td>{{ item.name }}</td>
+        <td style="text-align:center;">{{ item.qty }}</td>
+        <td style="text-align:right;">NT$ {{ item.price }}</td>
+        <td style="text-align:right;">NT$ {{ item.subtotal }}</td>
+
+        <td style="text-align:center;">
           <form method="post" action="{% url 'cart:remove_from_cart' item.id %}">
             {% csrf_token %}
-            <button type="submit" class="btn-danger">移除</button>
+            <button type="submit" class="btn-danger">
+              移除 <small>(Remove)</small>
+            </button>
           </form>
         </td>
       </tr>
@@ -36,13 +58,51 @@
     </tbody>
   </table>
 
-  <h3 class="cart-total">總金額：NT$ {{ total }}</h3>
+  <!-- ===== 總金額 ===== -->
+  <h3 class="cart-total">
+    總金額：NT$ {{ total }}<br>
+    <small>Total Amount</small>
+  </h3>
+
+  <!-- ===== 清空購物車 ===== -->
   <form method="post" action="{% url 'cart:clear_cart' %}">
     {% csrf_token %}
-    <button type="submit" class="btn-danger">🧹 清空購物車</button>
+    <button type="submit" class="btn-danger">
+      🧹 清空購物車 <small>(Clear Cart)</small>
+    </button>
   </form>
+
+  <!-- ===== 結帳按鈕（強制顯示版）===== -->
+  <div style="margin-top:25px;
+              display:flex;
+              justify-content:center;
+              position:relative;
+              z-index:999999;">
+    <a href="{% url 'cart:checkout' %}"
+       style="display:inline-block !important;
+              background:#007bff !important;
+              color:#fff !important;
+              padding:16px 26px !important;
+              border-radius:12px !important;
+              text-decoration:none !important;
+              font-weight:900 !important;
+              min-width:220px !important;
+              text-align:center !important;
+              box-shadow:0 12px 30px rgba(0,0,0,.25) !important;">
+      💳 結帳
+      <div style="font-size:12px;opacity:.9;margin-top:6px;">
+        Checkout
+      </div>
+    </a>
+  </div>
+
   {% else %}
-  <p>購物車內沒有商品。</p>
+  <p style="margin-top:30px;text-align:center;font-size:18px;">
+    購物車是空的。<br>
+    <small>Your shopping cart is empty.</small>
+  </p>
   {% endif %}
+
 </div>
+
 {% endblock %}

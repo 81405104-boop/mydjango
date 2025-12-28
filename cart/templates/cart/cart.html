@@ -1,33 +1,357 @@
 {% extends "base.html" %}
-{% block title %}購物車{% endblock %}
+{% load static %}
+
+{% block title %}購物車 | Shopping Cart{% endblock %}
 
 {% block content %}
-  <h2>🛒 我的購物車</h2>
+<div class="form-container cart-page">
+
+  <div class="tpl-badge">✅ cart/cart.html 正在使用</div>
+
+  <h2 class="cart-title">
+    🛒 我的購物車
+    <div class="en-sub-title">My Shopping Cart</div>
+  </h2>
 
   {% if items %}
-    <table border="1" cellpadding="8" cellspacing="0">
-      <tr>
-        <th>商品</th>
-        <th>數量</th>
-        <th>單價</th>
-        <th>小計</th>
-        <th>操作</th>
-      </tr>
-      {% for item in items %}
-      <tr>
-        <td>{{ item.product.name }}</td>
-        <td>{{ item.quantity }}</td>
-        <td>NT$ {{ item.product.price }}</td>
-        <td>NT$ {{ item.get_total_price }}</td>
-        <td>
-          <a href="{% url 'cart:remove_from_cart' item.id %}">❌ 移除</a>
-        </td>
-      </tr>
-      {% endfor %}
+  <div class="cart-card">
+
+    <table class="cart-table">
+      <thead>
+        <tr>
+          <th class="th-img">商品圖片<div class="en-sub">Product Image</div></th>
+          <th class="th-name">商品名稱<div class="en-sub">Product</div></th>
+          <th class="th-qty">數量<div class="en-sub">Quantity</div></th>
+          <th class="th-price">單價<div class="en-sub">Price</div></th>
+          <th class="th-subtotal">小計<div class="en-sub">Subtotal</div></th>
+          <th class="th-action">操作<div class="en-sub">Action</div></th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for item in items %}
+        <tr class="cart-row" data-pid="{{ item.id }}">
+          <td class="product-image-cell">
+            {% if item.image %}
+              <img
+                src="{% static 'images/products/' %}{{ item.image }}"
+                alt="{{ item.name }}"
+                class="cart-img"
+              >
+            {% else %}
+              <div class="cart-img no-img">
+                無圖片
+                <div class="en-sub">No Image</div>
+              </div>
+            {% endif %}
+          </td>
+
+          <!-- ✅ 商品名稱置中 -->
+          <td class="product-name-cell">
+            <div class="product-name">{{ item.name }}</div>
+          </td>
+
+          <!-- ✅ 數量：+ / - 即時調整 -->
+          <td class="qty-cell">
+            <div class="qty-ui">
+              <button type="button" class="qty-btn" data-action="dec">−</button>
+              <span class="qty-num" id="qty-{{ item.id }}">{{ item.qty }}</span>
+              <button type="button" class="qty-btn" data-action="inc">+</button>
+            </div>
+          </td>
+
+          <td class="price-cell">NT$ {{ item.price }}</td>
+
+          <td class="subtotal-cell">
+            <span id="subtotal-{{ item.id }}">NT$ {{ item.subtotal }}</span>
+          </td>
+
+          <td class="action-cell">
+            <form method="post" action="{% url 'cart:remove_from_cart' item.id %}">
+              {% csrf_token %}
+              <button type="submit" class="cart-btn cart-btn-danger">
+                移除
+                <span class="en-sub-btn">Remove</span>
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
     </table>
-    <p><strong>總計：</strong>NT$ {{ total }}</p>
-    <a href="{% url 'cart:clear_cart' %}">🗑 清空購物車</a>
+
+    <!-- ====== 底部結帳區（卡片底部） ====== -->
+    <div class="cart-footer">
+      <div class="cart-total-box">
+        <div class="cart-total-text">
+          總金額：<span id="cart-total">NT$ {{ total }}</span>
+          <div class="en-sub-title">Total Amount</div>
+        </div>
+      </div>
+
+      <div class="cart-actions">
+        <form method="post" action="{% url 'cart:clear_cart' %}">
+          {% csrf_token %}
+          <button type="submit" class="cart-btn cart-btn-danger cart-btn-wide">
+            🧹 清空購物車
+            <span class="en-sub-btn">Clear Cart</span>
+          </button>
+        </form>
+
+        <a href="{% url 'cart:checkout' %}" class="cart-btn cart-btn-checkout cart-btn-wide">
+          💳 結帳
+          <span class="en-sub-btn">Checkout</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
   {% else %}
-    <p>購物車目前是空的。</p>
+    <div class="cart-card empty">
+      <p class="empty-cart">
+        購物車是空的。
+        <span class="en-sub-title">Your cart is empty.</span>
+      </p>
+      <a class="cart-btn cart-btn-checkout cart-btn-wide" href="{% url 'products:home' %}">
+        🛍️ 去逛逛
+        <span class="en-sub-btn">Back to Shop</span>
+      </a>
+    </div>
   {% endif %}
+
+</div>
+
+<script>
+/* ===== CSRF (for AJAX POST) ===== */
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+const csrftoken = getCookie('csrftoken');
+
+/* ===== + / - 即時更新 ===== */
+document.addEventListener("click", async (e) => {
+  const btn = e.target.closest(".qty-btn");
+  if (!btn) return;
+
+  const row = btn.closest("tr[data-pid]");
+  const pid = row.getAttribute("data-pid");
+  const action = btn.getAttribute("data-action");
+
+  try {
+    const res = await fetch(`/cart/update/${pid}/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "X-CSRFToken": csrftoken
+      },
+      body: new URLSearchParams({ action })
+    });
+
+    const data = await res.json();
+    if (!data.ok) return;
+
+    // 更新數量
+    document.getElementById(`qty-${pid}`).textContent = data.qty;
+
+    // 更新小計
+    document.getElementById(`subtotal-${pid}`).textContent = `NT$ ${data.subtotal}`;
+
+    // 更新總額
+    document.getElementById("cart-total").textContent = `NT$ ${data.total}`;
+  } catch (err) {
+    console.error(err);
+  }
+});
+</script>
+
+<style>
+/* ====== 版面 ====== */
+.cart-page{ max-width: 980px; margin: 0 auto; }
+.cart-card{
+  background: rgba(255,255,255,.92);
+  border-radius: 18px;
+  box-shadow: 0 18px 40px rgba(0,0,0,.12);
+  overflow: hidden;
+}
+
+/* ====== 確認標記 ====== */
+.tpl-badge{
+  display:inline-block;
+  margin: 0 auto 12px;
+  padding:6px 12px;
+  border-radius:999px;
+  background: rgba(34,197,94,.12);
+  border: 1px solid rgba(34,197,94,.35);
+  color:#14532d;
+  font-weight:800;
+  font-size:13px;
+}
+
+/* ====== 英文輔助 ====== */
+.en-sub{ font-size:12px; color:#6b7280; margin-top:4px; }
+.en-sub-title{ font-size:14px; color:#555; margin-top:6px; }
+.en-sub-btn{ font-size:12px; opacity:.9; }
+
+/* ====== 表格 ====== */
+.cart-table{ width:100%; border-collapse: separate; border-spacing: 0; }
+.cart-table thead th{
+  background: rgba(249,250,251,.95);
+  font-weight:900;
+  padding: 14px 12px;
+  text-align:center;
+  border-bottom: 1px solid rgba(0,0,0,.08);
+}
+.cart-table tbody td{
+  padding: 14px 12px;
+  vertical-align: middle;
+  border-bottom: 1px solid rgba(0,0,0,.06);
+}
+.cart-row:hover{ background: rgba(0,0,0,.02); }
+
+/* 欄寬 */
+.th-img{ width: 140px; }
+.th-name{ width: 240px; }
+.th-qty{ width: 140px; }
+.th-price{ width: 160px; }
+.th-subtotal{ width: 160px; }
+.th-action{ width: 160px; }
+
+/* 圖片 */
+.product-image-cell{ text-align:center; }
+.cart-img{
+  width: 86px; height: 86px; object-fit: cover;
+  border-radius: 14px; background:#fff;
+  box-shadow: 0 10px 20px rgba(0,0,0,.10);
+}
+.no-img{
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  font-weight:800; color:#555;
+}
+
+/* ✅ 商品名稱置中 */
+.product-name-cell{ text-align:center; }
+.product-name{ font-weight:900; font-size:18px; letter-spacing:.3px; }
+
+/* 數字欄位 */
+.price-cell, .subtotal-cell{ text-align:right; }
+.qty-cell{ text-align:center; }
+
+/* 數量 UI */
+.qty-ui{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  background: rgba(0,0,0,.04);
+  padding: 8px 10px;
+  border-radius: 999px;
+}
+.qty-btn{
+  width:34px; height:34px;
+  border:none;
+  border-radius: 999px;
+  font-size:18px;
+  font-weight:900;
+  cursor:pointer;
+  background:#fff;
+  box-shadow: 0 6px 14px rgba(0,0,0,.10);
+}
+.qty-num{
+  min-width: 22px;
+  display:inline-block;
+  font-weight:900;
+}
+
+/* 底部結帳區（卡片底部） */
+.cart-footer{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:16px;
+  padding:18px 20px;
+  flex-wrap:wrap;
+}
+.cart-total-text{ font-size:20px; font-weight:900; }
+.cart-actions{ display:flex; gap:12px; flex-wrap:wrap; }
+
+/* 按鈕 */
+.cart-btn{
+  display:inline-flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  border:none;
+  cursor:pointer;
+  text-decoration:none;
+  padding:14px 22px;
+  border-radius:14px;
+  font-weight:900;
+}
+.cart-btn-wide{ min-width: 200px; }
+.cart-btn-danger{ background:#dc3545; color:#fff; }
+.cart-btn-checkout{ background:#2d6cdf; color:#fff; }
+.cart-btn:hover{ opacity:.92; }
+
+/* 空購物車 */
+.empty-cart{ font-size:18px; text-align:center; }
+
+/* ========== ✅ 手機版：表格改卡片式 ========== */
+@media (max-width: 768px){
+  .cart-table thead{ display:none; }
+  .cart-table, .cart-table tbody, .cart-table tr, .cart-table td{
+    display:block;
+    width:100%;
+  }
+  .cart-table tr{
+    background:#fff;
+    border-radius:16px;
+    box-shadow:0 10px 25px rgba(0,0,0,.10);
+    margin: 12px 0;
+    overflow:hidden;
+  }
+  .cart-table td{
+    border-bottom: 1px solid rgba(0,0,0,.06);
+    padding: 12px 14px;
+  }
+  .cart-table td:last-child{ border-bottom:none; }
+
+  .product-image-cell{ text-align:center; padding-top:14px; }
+  .cart-img{ width:120px; height:120px; border-radius:16px; }
+
+  .product-name-cell{ text-align:center; }
+  .product-name{ font-size:20px; }
+
+  .qty-cell, .price-cell, .subtotal-cell, .action-cell{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    text-align:left;
+  }
+  .qty-cell::before{ content:"數量"; font-weight:900; color:#374151; }
+  .price-cell::before{ content:"單價"; font-weight:900; color:#374151; }
+  .subtotal-cell::before{ content:"小計"; font-weight:900; color:#374151; }
+  .action-cell::before{ content:"操作"; font-weight:900; color:#374151; }
+
+  /* 手機底部 sticky 更像電商 */
+  .cart-footer{
+    position: sticky;
+    bottom: 0;
+    background: rgba(255,255,255,.95);
+    backdrop-filter: blur(6px);
+    border-top: 1px solid rgba(0,0,0,.08);
+  }
+  .cart-btn-wide{ min-width: 160px; }
+}
+</style>
+
 {% endblock %}
