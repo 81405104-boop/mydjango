@@ -1,68 +1,459 @@
 {% extends "base.html" %}
 {% load static %}
-{% block title %}購物車{% endblock %}
+
+{% block title %}購物車 | Shopping Cart{% endblock %}
 
 {% block content %}
-<div style="max-width: 900px; margin: 40px auto; background: white; padding: 25px; border-radius: 10px; box-shadow: 0 3px 10px rgba(0,0,0,0.1);">
 
-  <h2 style="text-align:center; margin-bottom:25px;">🛒 我的購物車</h2>
+<!-- ================== TEMPLATE TEST（一定會浮在最上層） ================== -->
+<div style="
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  z-index:999999;
+  background:#111;
+  color:#8dff8d;
+  padding:10px 14px;
+  font-weight:900;
+  border-radius:10px;
+  box-shadow:0 10px 30px rgba(0,0,0,.45);
+  letter-spacing:.2px;
+">
+  ✅ 第五組 
+</div>
+<!-- ===================================================================== -->
+
+<div class="cart-page">
+
+  <!-- 標題 -->
+  <div class="cart-header">
+    <div class="cart-badge">🛒 Cart</div>
+    <h2 class="cart-title">我的購物車</h2>
+    <div class="cart-subtitle">My Shopping Cart</div>
+  </div>
 
   {% if items %}
-    <table class="cart-table">
-      <thead>
-        <tr>
-          <th>商品圖片</th>
-          <th>商品名稱</th>
-          <th>數量</th>
-          <th>單價</th>
-          <th>小計</th>
-          <th>操作</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for item in items %}
-        <tr>
-          <td>
-            {% if item.image %}
-              <img src="{% static 'images/products/' %}{{ item.image }}" alt="{{ item.name }}" class="cart-img">
-            {% else %}
-              <div class="cart-img no-img">No Image</div>
-            {% endif %}
-          </td>
-          <td>{{ item.name }}</td>
-          <td>{{ item.qty }}</td>
-          <td>NT$ {{ item.price }}</td>
-          <td>NT$ {{ item.subtotal }}</td>
-          <td>
-            <form method="post" action="{% url 'cart:remove_from_cart' item.id %}">
-              {% csrf_token %}
-              <button type="submit" class="btn-danger">移除</button>
-            </form>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+  <div class="cart-card">
 
-    <h3 class="cart-total">總金額：NT$ {{ total }}</h3>
+    <!-- 桌機表格 -->
+    <div class="cart-table-wrap">
+      <table class="cart-table">
+        <thead>
+          <tr>
+            <th>商品</th>
+            <th>名稱</th>
+            <th class="th-center">數量</th>
+            <th class="th-right">單價</th>
+            <th class="th-right">小計</th>
+            <th class="th-center">操作</th>
+          </tr>
+        </thead>
 
-    <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:25px;">
-      <form method="post" action="{% url 'cart:checkout' %}">
-        {% csrf_token %}
-        <button type="submit" class="btn-primary">💳 前往結帳</button>
-      </form>
+        <tbody>
+          {% for item in items %}
+          <tr>
+            <td>
+              <div class="cart-product">
+                {% if item.image %}
+                  <img
+                    src="{% static 'images/products/' %}{{ item.image }}"
+                    alt="{{ item.name }}"
+                    class="cart-img"
+                    loading="lazy"
+                  >
+                {% else %}
+                  <div class="cart-img cart-noimg">No Image</div>
+                {% endif %}
+              </div>
+            </td>
 
+            <td class="td-name">
+              <div class="name-zh">{{ item.name }}</div>
+              <div class="name-en">Product</div>
+            </td>
+
+            <td class="td-center">
+              <span class="qty-pill">{{ item.qty }}</span>
+            </td>
+
+            <td class="td-right money">NT$ {{ item.price }}</td>
+            <td class="td-right money strong">NT$ {{ item.subtotal }}</td>
+
+            <td class="td-center">
+              <form method="post" action="{% url 'cart:remove_from_cart' item.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-ghost-danger" aria-label="Remove">
+                  移除
+                  <span class="btn-sub">Remove</span>
+                </button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 手機卡片 (RWD) -->
+    <div class="cart-mobile">
+      {% for item in items %}
+      <div class="m-item">
+        <div class="m-left">
+          {% if item.image %}
+            <img
+              src="{% static 'images/products/' %}{{ item.image }}"
+              alt="{{ item.name }}"
+              class="m-img"
+              loading="lazy"
+            >
+          {% else %}
+            <div class="m-img m-noimg">No Image</div>
+          {% endif %}
+        </div>
+
+        <div class="m-mid">
+          <div class="m-name">{{ item.name }}</div>
+          <div class="m-meta">
+            <span>Qty: <b>{{ item.qty }}</b></span>
+            <span>Price: <b>NT$ {{ item.price }}</b></span>
+          </div>
+          <div class="m-subtotal">Subtotal: <b>NT$ {{ item.subtotal }}</b></div>
+        </div>
+
+        <div class="m-right">
+          <form method="post" action="{% url 'cart:remove_from_cart' item.id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-ghost-danger small">
+              移除
+              <span class="btn-sub">Remove</span>
+            </button>
+          </form>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- 總金額 -->
+    <div class="cart-total">
+      <div class="total-left">
+        <div class="total-label">總金額</div>
+        <div class="total-sub">Total Amount</div>
+      </div>
+      <div class="total-right">NT$ {{ total }}</div>
+    </div>
+
+    <!-- 行動按鈕 -->
+    <div class="cart-actions">
       <form method="post" action="{% url 'cart:clear_cart' %}">
         {% csrf_token %}
-        <button type="submit" class="btn-secondary">🧹 清空購物車</button>
+        <button type="submit" class="btn btn-danger">
+          清空購物車
+          <span class="btn-sub">Clear Cart</span>
+        </button>
       </form>
+
+      <a href="{% url 'cart:checkout' %}" class="btn btn-primary">
+        💳 結帳
+        <span class="btn-sub">Checkout</span>
+      </a>
     </div>
 
+  </div>
   {% else %}
-    <p style="text-align:center; font-size:18px;">購物車目前是空的 🛍️</p>
-    <div style="text-align:center; margin-top:20px;">
-      <a href="{% url 'products:home' %}" class="btn-primary">返回首頁繼續購物</a>
+    <div class="empty-state">
+      <div class="empty-emoji">🧺</div>
+      <div class="empty-title">購物車是空的</div>
+      <div class="empty-sub">Your cart is empty.</div>
+      <a class="btn btn-primary" href="/" style="margin-top:14px;">
+        去逛逛
+        <span class="btn-sub">Continue Shopping</span>
+      </a>
     </div>
   {% endif %}
+
 </div>
+
+<style>
+/* ============ 基礎 ============ */
+.cart-page{
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 28px 16px 60px;
+  font-family: system-ui, -apple-system, "Segoe UI", "Noto Sans TC", Arial, sans-serif;
+  color:#1f2937;
+}
+.cart-header{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  margin: 6px 0 18px;
+}
+.cart-badge{
+  display:inline-flex;
+  width: fit-content;
+  align-items:center;
+  gap:8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #f3f4f6;
+  color:#111827;
+  font-weight:800;
+  font-size:12px;
+}
+.cart-title{
+  margin:0;
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: .2px;
+}
+.cart-subtitle{
+  margin-top:-4px;
+  color:#6b7280;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* ============ 容器卡片 ============ */
+.cart-card{
+  background:#fff;
+  border: 1px solid rgba(17,24,39,.08);
+  border-radius: 18px;
+  box-shadow: 0 14px 40px rgba(17,24,39,.08);
+  overflow:hidden;
+}
+
+/* ============ 桌機表格 ============ */
+.cart-table-wrap{ overflow:auto; }
+.cart-table{
+  width:100%;
+  border-collapse: collapse;
+  min-width: 860px;
+}
+.cart-table thead th{
+  position: sticky;
+  top: 0;
+  background: #f9fafb;
+  border-bottom: 1px solid rgba(17,24,39,.08);
+  padding: 14px 14px;
+  font-size: 13px;
+  color:#374151;
+  text-align:left;
+  font-weight: 900;
+}
+.th-center{ text-align:center; }
+.th-right{ text-align:right; }
+
+.cart-table tbody td{
+  border-bottom: 1px solid rgba(17,24,39,.06);
+  padding: 14px;
+  vertical-align: middle;
+}
+.cart-table tbody tr:hover{
+  background: rgba(249,250,251,.75);
+}
+
+.cart-product{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.cart-img{
+  width:72px;
+  height:72px;
+  border-radius: 14px;
+  object-fit: cover;
+  border: 1px solid rgba(17,24,39,.08);
+  background: #fff;
+}
+.cart-noimg{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#6b7280;
+  font-weight:800;
+  font-size:12px;
+  background:#f3f4f6;
+}
+
+.td-name .name-zh{ font-weight: 900; }
+.td-name .name-en{ margin-top:4px; color:#6b7280; font-size:12px; font-weight:700; }
+
+.qty-pill{
+  display:inline-flex;
+  min-width:44px;
+  justify-content:center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background:#f3f4f6;
+  font-weight: 900;
+  color:#111827;
+}
+.money{ font-variant-numeric: tabular-nums; }
+.strong{ font-weight: 900; color:#111827; }
+.td-center{ text-align:center; }
+.td-right{ text-align:right; }
+
+/* ============ Total + Actions ============ */
+.cart-total{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  padding: 16px 18px;
+  background: linear-gradient(0deg, #ffffff, #fbfdff);
+  border-top: 1px solid rgba(17,24,39,.06);
+}
+.total-label{
+  font-size: 14px;
+  font-weight: 900;
+}
+.total-sub{
+  font-size: 12px;
+  color:#6b7280;
+  font-weight: 800;
+  margin-top:4px;
+}
+.total-right{
+  font-size: 24px;
+  font-weight: 1000;
+  letter-spacing: .2px;
+}
+
+.cart-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:12px;
+  padding: 16px 18px 18px;
+  background:#fff;
+}
+
+/* ============ Buttons ============ */
+.btn{
+  display:inline-flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:2px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  border: 1px solid transparent;
+  text-decoration:none;
+  cursor:pointer;
+  font-weight: 900;
+  min-width: 170px;
+  transition: transform .06s ease, opacity .18s ease, box-shadow .18s ease;
+}
+.btn:active{ transform: translateY(1px); }
+.btn-sub{
+  font-size: 12px;
+  font-weight: 800;
+  opacity:.9;
+}
+
+.btn-primary{
+  background:#2563eb;
+  color:#fff;
+  box-shadow: 0 10px 20px rgba(37,99,235,.22);
+}
+.btn-primary:hover{ opacity:.95; }
+
+.btn-danger{
+  background:#dc2626;
+  color:#fff;
+  box-shadow: 0 10px 20px rgba(220,38,38,.18);
+}
+.btn-danger:hover{ opacity:.95; }
+
+.btn-ghost-danger{
+  background: #fff;
+  color:#dc2626;
+  border: 1px solid rgba(220,38,38,.25);
+  min-width: 120px;
+  padding: 10px 12px;
+}
+.btn-ghost-danger:hover{
+  background: rgba(220,38,38,.06);
+}
+.btn-ghost-danger.small{ min-width: 92px; padding: 10px 10px; }
+
+/* ============ Empty State ============ */
+.empty-state{
+  margin-top: 18px;
+  background:#fff;
+  border: 1px dashed rgba(17,24,39,.18);
+  border-radius: 18px;
+  padding: 34px 18px;
+  text-align:center;
+  box-shadow: 0 14px 40px rgba(17,24,39,.06);
+}
+.empty-emoji{ font-size: 34px; }
+.empty-title{ margin-top: 10px; font-size: 18px; font-weight: 1000; }
+.empty-sub{ margin-top: 6px; color:#6b7280; font-weight: 800; }
+
+/* ============ RWD：手機用卡片取代表格 ============ */
+.cart-mobile{ display:none; padding: 12px 12px 0; }
+.m-item{
+  display:flex;
+  gap:12px;
+  padding: 12px;
+  border: 1px solid rgba(17,24,39,.08);
+  border-radius: 16px;
+  margin-bottom: 10px;
+  background:#fff;
+}
+.m-img{
+  width:84px;
+  height:84px;
+  border-radius: 16px;
+  object-fit: cover;
+  border: 1px solid rgba(17,24,39,.08);
+  background:#fff;
+}
+.m-noimg{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#f3f4f6;
+  color:#6b7280;
+  font-weight:900;
+  font-size:12px;
+}
+.m-mid{ flex:1; min-width: 0; }
+.m-name{
+  font-weight: 1000;
+  line-height: 1.2;
+  margin-top: 2px;
+  word-break: break-word;
+}
+.m-meta{
+  margin-top: 8px;
+  display:flex;
+  gap: 12px;
+  color:#374151;
+  font-size: 13px;
+}
+.m-subtotal{
+  margin-top: 8px;
+  color:#111827;
+  font-size: 13px;
+}
+.m-right{ display:flex; align-items:center; }
+
+/* 切換：小於 900px 時，隱藏表格顯示手機卡片 */
+@media (max-width: 900px){
+  .cart-table-wrap{ display:none; }
+  .cart-mobile{ display:block; }
+  .cart-actions{
+    flex-direction:column;
+    align-items:stretch;
+  }
+  .btn{ width:100%; min-width:0; }
+  .cart-total{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+  .total-right{ font-size: 22px; }
+}
+</style>
+
 {% endblock %}
