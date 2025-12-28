@@ -4,6 +4,13 @@
 {% block content %}
 <div class="form-container">
   <h2>📝 註冊帳號</h2>
+
+  {% if form.errors %}
+    <div style="background:#ffecec;border:1px solid #ffb3b3;padding:12px;border-radius:10px;margin-bottom:12px;color:#b00020;font-weight:800;">
+      {{ form.errors }}
+    </div>
+  {% endif %}
+
   <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
