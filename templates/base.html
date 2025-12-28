@@ -9,7 +9,8 @@
     /* ====== 整體風格 ====== */
     body.site-bg {
       margin: 0;
-      overflow: hidden;
+      overflow-x: hidden;   /* ✅ 保留左右不捲 */
+      overflow-y: auto;     /* ✅ 允許往下捲（關鍵修正） */
       font-family: "Noto Sans TC", "Segoe UI Emoji", sans-serif;
       background: radial-gradient(circle at center, #f8f3e6, #e3caa5, #b59f3b);
       animation: fadeInTemple 2s ease-out;
@@ -45,7 +46,7 @@
     body::after {
       content: "";
       position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
+      inset: 0;
       background: radial-gradient(circle, rgba(255,215,0,0.25) 0%, transparent 70%);
       animation: softGlow 5s ease-in-out infinite alternate;
       z-index: -2;
@@ -159,7 +160,6 @@
   <div class="light-rays"></div>
 
   <script>
-    // === 生成粒子效果 ===
     for (let i = 0; i < 40; i++) {
       const particle = document.createElement('div');
       particle.classList.add('particle');
@@ -175,89 +175,30 @@
     }
   </script>
 
-  <!-- ====== 導覽列（旗幟置中） ====== -->
+  <!-- ====== 導覽列 ====== -->
   <nav class="navbar">
-    <img src="{% static 'images/flags/nepal_flag.png' %}" alt="尼泊爾國旗" class="flag">
+    <img src="{% static 'images/flags/nepal_flag.png' %}" class="flag">
 
     <div class="nav-center">
-      <a href="{% url 'products:home' %}" class="navbar-link">
-        🏠 首頁
-        <span class="en-text">Home</span>
-      </a>
-
-      <a href="{% url 'cart:cart_view' %}" class="navbar-link">
-        🛒 購物車
-        <span class="en-text">Cart</span>
-      </a>
+      <a href="{% url 'products:home' %}" class="navbar-link">🏠 首頁<span class="en-text">Home</span></a>
+      <a href="{% url 'cart:cart_view' %}" class="navbar-link">🛒 購物車<span class="en-text">Cart</span></a>
 
       {% if user.is_authenticated %}
         <span class="navbar-user">👤 {{ user.username }}</span>
-        <form method="post" action="{% url 'accounts:logout' %}" style="display:inline;">
+        <form method="post" action="{% url 'accounts:logout' %}">
           {% csrf_token %}
-          <button type="submit" class="navbar-btn">
-            🚪 登出
-            <span class="en-text">Logout</span>
-          </button>
+          <button type="submit" class="navbar-btn">🚪 登出<span class="en-text">Logout</span></button>
         </form>
       {% else %}
-        <a href="{% url 'accounts:login' %}" class="navbar-link">
-          🔑 登入
-          <span class="en-text">Login</span>
-        </a>
-        <a href="{% url 'accounts:register' %}" class="navbar-link">
-          📝 註冊
-          <span class="en-text">Register</span>
-        </a>
+        <a href="{% url 'accounts:login' %}" class="navbar-link">🔑 登入<span class="en-text">Login</span></a>
+        <a href="{% url 'accounts:register' %}" class="navbar-link">📝 註冊<span class="en-text">Register</span></a>
       {% endif %}
     </div>
 
-    <img src="{% static 'images/flags/taiwan_flag.png' %}" alt="中華民國國旗" class="flag">
+    <img src="{% static 'images/flags/taiwan_flag.png' %}" class="flag">
   </nav>
 
   {% block content %}{% endblock %}
-
-  <!-- ====== 神殿音樂背景（立即播放 + 記憶播放時間） ====== -->
-  <audio id="bgm" preload="auto" playsinline>
-    <source src="{% static 'music/temple_theme.mp3' %}" type="audio/mpeg">
-    您的瀏覽器不支援音樂播放。
-  </audio>
-
-  <script>
-    const bgm = document.getElementById("bgm");
-    const STORAGE_KEY = "temple_bgm_time";
-
-    // 從 localStorage 取回上次播放時間
-    const savedTime = localStorage.getItem(STORAGE_KEY);
-    if (savedTime) bgm.currentTime = parseFloat(savedTime);
-
-    function playTempleMusic() {
-      bgm.volume = 0.4;
-      const tryPlay = () => {
-        bgm.play().catch(() => setTimeout(tryPlay, 500));
-      };
-      tryPlay();
-    }
-
-    // 每秒記錄播放進度
-    setInterval(() => {
-      if (!bgm.paused && bgm.currentTime > 0) {
-        localStorage.setItem(STORAGE_KEY, bgm.currentTime);
-      }
-    }, 1000);
-
-    // 自動重播
-    bgm.addEventListener("ended", () => {
-      bgm.currentTime = 0;
-      bgm.play();
-    });
-
-    // 若被暫停，自動恢復播放
-    setInterval(() => {
-      if (bgm.paused) bgm.play().catch(() => {});
-    }, 3000);
-
-    document.addEventListener("DOMContentLoaded", playTempleMusic);
-  </script>
 
 </body>
 </html>

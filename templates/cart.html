@@ -1,23 +1,33 @@
 {% extends "base.html" %}
 {% load static %}
-
-{% block title %}Shopping Cart{% endblock %}
+{% block title %}購物車 | Shopping Cart{% endblock %}
 
 {% block content %}
+
+<!-- ✅ DEBUG：確認這份 templates/cart.html 有被用到 -->
+<div style="position:fixed;top:10px;left:10px;z-index:999999;
+            background:purple;color:white;padding:6px 10px;font-weight:900;">
+  USING templates/cart.html
+</div>
+
 <div class="form-container">
 
-  <h2 class="cart-title">🛒 My Shopping Cart</h2>
+  <!-- 標題 -->
+  <h2 class="cart-title">
+    🛒 我的購物車
+    <div class="en-sub-title">My Shopping Cart</div>
+  </h2>
 
   {% if items %}
     <table class="cart-table">
       <thead>
         <tr>
-          <th>Product Image</th>
-          <th>Product</th>
-          <th>Quantity</th>
-          <th>Price</th>
-          <th>Subtotal</th>
-          <th>Action</th>
+          <th>商品圖片<div class="en-sub">Product Image</div></th>
+          <th>名稱<div class="en-sub">Product Name</div></th>
+          <th>數量<div class="en-sub">Quantity</div></th>
+          <th>單價<div class="en-sub">Price</div></th>
+          <th>小計<div class="en-sub">Subtotal</div></th>
+          <th>操作<div class="en-sub">Action</div></th>
         </tr>
       </thead>
 
@@ -32,20 +42,24 @@
                 class="cart-img"
               >
             {% else %}
-              <div class="cart-img no-img">No Image</div>
+              <div class="cart-img no-img">
+                無圖片
+                <div class="en-sub">No Image</div>
+              </div>
             {% endif %}
           </td>
 
           <td>{{ item.name }}</td>
-          <td>{{ item.qty }}</td>
-          <td>NT$ {{ item.price }}</td>
-          <td>NT$ {{ item.subtotal }}</td>
+          <td style="text-align:center;">{{ item.qty }}</td>
+          <td style="text-align:right;">NT$ {{ item.price }}</td>
+          <td style="text-align:right;">NT$ {{ item.subtotal }}</td>
 
-          <td>
+          <td style="text-align:center;">
             <form method="post" action="{% url 'cart:remove_from_cart' item.id %}">
               {% csrf_token %}
-              <button type="submit" class="btn-danger">
-                Remove
+              <button type="submit" class="cart-btn cart-btn-danger">
+                移除
+                <div class="en-sub-btn">Remove</div>
               </button>
             </form>
           </td>
@@ -54,22 +68,106 @@
       </tbody>
     </table>
 
+    <!-- 總金額 -->
     <h3 class="cart-total">
-      Total: NT$ {{ total }}
+      總金額：NT$ {{ total }}
+      <div class="en-sub-title">Total Amount</div>
     </h3>
 
-    <form method="post" action="{% url 'cart:clear_cart' %}">
-      {% csrf_token %}
-      <button type="submit" class="btn-danger">
-        Clear Cart
-      </button>
-    </form>
+    <!-- ✅ 動作按鈕區：清空 + 結帳（強制顯示/防遮擋） -->
+    <div class="cart-actions">
+      <!-- 清空購物車 -->
+      <form method="post" action="{% url 'cart:clear_cart' %}">
+        {% csrf_token %}
+        <button type="submit" class="cart-btn cart-btn-danger">
+          清空購物車
+          <div class="en-sub-btn">Clear Cart</div>
+        </button>
+      </form>
+
+      <!-- 結帳 -->
+      <a href="{% url 'cart:checkout' %}" class="cart-btn cart-btn-checkout">
+        💳 結帳
+        <div class="en-sub-btn">Checkout</div>
+      </a>
+    </div>
 
   {% else %}
     <p class="empty-cart">
-      Your cart is empty.
+      購物車是空的。
+      <div class="en-sub-title">Your shopping cart is empty.</div>
     </p>
   {% endif %}
 
 </div>
+
+<!-- === 中英文輔助樣式（確保看得到） + 按鈕強制樣式 === -->
+<style>
+  .en-sub {
+    font-size: 13px;
+    color: #666;
+    margin-top: 4px;
+  }
+
+  .en-sub-title {
+    font-size: 14px;
+    color: #555;
+    margin-top: 6px;
+    font-weight: normal;
+  }
+
+  .en-sub-btn {
+    font-size: 12px;
+    color: #fff;
+    opacity: 0.85;
+    margin-top: 2px;
+  }
+
+  .empty-cart {
+    font-size: 18px;
+    margin-top: 20px;
+    text-align: center;
+  }
+
+  /* ✅ 按鈕區：避免被其他 CSS 蓋掉或擋住 */
+  .cart-actions{
+    margin-top: 18px;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 999999; /* 再拉高一點 */
+  }
+
+  /* ✅ 專用按鈕（不吃全站 btn-primary/btn-danger） */
+  .cart-btn{
+    display: inline-flex !important;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-width: 160px;
+    padding: 12px 18px;
+    border-radius: 10px;
+    font-weight: 900;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+  }
+
+  .cart-btn-danger{
+    background: #dc3545;
+    color: #fff;
+  }
+
+  .cart-btn-checkout{
+    background: #007bff;
+    color: #fff;
+  }
+
+  .cart-btn:hover{ opacity: .92; }
+</style>
+
 {% endblock %}
