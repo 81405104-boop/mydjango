@@ -1,6 +1,6 @@
-﻿"""
+"""
 mysite/settings.py
-Django 專案設定檔（開發用）
+Django 購物網站設定檔（開發／cpolar 部署用 + Whitenoise 加速）
 """
 
 from pathlib import Path
@@ -15,7 +15,26 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # -----------------------------
 SECRET_KEY = 'dev-secret-key-change-me'   # ⚠️ 上線時請改用環境變數儲存
 DEBUG = True
-ALLOWED_HOSTS = []  # 上線時請設定 ['你的網域', '伺服器IP']
+
+# ✅ 允許的 Host（本機 + cpolar 網域）
+ALLOWED_HOSTS = [
+    '192.168.1.145',
+    'localhost',
+    '127.0.0.1',
+    'moontv.hk.cpolar.io',
+    'django1.tw.cpolar.io',
+    'django2.tw.cpolar.io',
+]
+
+# ✅ CSRF 信任來源
+CSRF_TRUSTED_ORIGINS = [
+    'http://192.168.1.145',
+    'http://localhost',
+    'http://127.0.0.1',
+    'https://moontv.hk.cpolar.io',
+    'https://django1.tw.cpolar.io',
+    'https://django2.tw.cpolar.io',
+]
 
 # -----------------------------
 # 已安裝的 App
@@ -36,10 +55,11 @@ INSTALLED_APPS = [
 ]
 
 # -----------------------------
-# 中介層設定
+# 中介層設定（Whitenoise 加速）
 # -----------------------------
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # ✅ 加速 static file
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -59,7 +79,7 @@ ROOT_URLCONF = 'mysite.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],   # 專案層級模板資料夾
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -108,20 +128,18 @@ USE_I18N = True
 USE_TZ = True
 
 # -----------------------------
-# 靜態檔案設定（CSS / JS / 圖片）
+# 靜態檔案設定
 # -----------------------------
 STATIC_URL = '/static/'
-
-# 開發環境：直接從專案資料夾載入 static
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
-
-# 上線部署時收集靜態檔案的目標資料夾
+STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
+# ✅ Whitenoise 加速設定
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+WHITENOISE_MAX_AGE = 31536000  # 📦 圖片 / CSS / JS 快取一年（秒）
+
 # -----------------------------
-# 媒體檔案設定（使用者上傳）
+# 媒體檔案設定
 # -----------------------------
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -136,6 +154,16 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # -----------------------------
 LOGIN_REDIRECT_URL = "/"   # 登入後回首頁
 LOGOUT_REDIRECT_URL = "/"  # 登出後回首頁
+
+# -----------------------------
+# 📧（可選）Email 設定
+# -----------------------------
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = 'your_email@gmail.com'
+# EMAIL_HOST_PASSWORD = 'your_app_password'
 
 # -----------------------------
 # 附加說明（開發提示）
